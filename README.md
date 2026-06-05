@@ -1,81 +1,123 @@
-# Spring Boot JPA PostgreSQL example with Maven
+# HRMS Construction — Java Backend Developer Assignment
 
-For instruction, please visit:
-> [Spring Boot PostgreSQL with Maven example using Spring Data JPA](https://www.bezkoder.com/spring-boot-postgresql-example/)
+## Forked From
+[bezkoder/spring-boot-jpa-postgresql](https://github.com/bezkoder/spring-boot-jpa-postgresql) — chosen for its clean Spring Boot 3 + JPA + PostgreSQL structure with minimal boilerplate, making it easy to extend without fighting existing code.
 
-Front-end that works well with this Back-end
-> [Angular 8](https://www.bezkoder.com/angular-crud-app/) / [Angular 10](https://www.bezkoder.com/angular-10-crud-app/) / [Angular 11](https://www.bezkoder.com/angular-11-crud-app/) / [Angular 12](https://www.bezkoder.com/angular-12-crud-app/) / [Angular 13](https://www.bezkoder.com/angular-13-crud-example/) / [Angular 14](https://www.bezkoder.com/angular-14-crud-example/) / [Angular 15](https://www.bezkoder.com/angular-15-crud-example/) / [Angular 16](https://www.bezkoder.com/angular-16-crud-example/) / [Angular 17 Client](https://www.bezkoder.com/angular-17-crud-example/)
+---
 
-> [Vue 2](https://www.bezkoder.com/vue-js-crud-app/) / [Vue 3](https://www.bezkoder.com/vue-3-crud/) / [Vuetify Client](https://www.bezkoder.com/vuetify-data-table-example/)
+## Setup Instructions
 
-> [React](https://www.bezkoder.com/react-crud-web-api/) / [React Redux Client](https://www.bezkoder.com/react-redux-crud-example/)
+### Prerequisites
+- Java 17+
+- Maven 3.9+
+- Docker (for Redis)
+- A Supabase account (free tier)
 
-More practice:
-> [Spring Boot Validate Request Body](https://www.bezkoder.com/spring-boot-validate-request-body/)
-
-> [Spring Boot File upload example with Multipart File](https://www.bezkoder.com/spring-boot-file-upload/)
-
-> [Spring Boot Pagination & Filter example | Spring JPA, Pageable](https://www.bezkoder.com/spring-boot-pagination-filter-jpa-pageable/)
-
-> [Spring Data JPA Sort/Order by multiple Columns | Spring Boot](https://www.bezkoder.com/spring-data-sort-multiple-columns/)
-
-> [Spring Boot Repository Unit Test with @DataJpaTest](https://www.bezkoder.com/spring-boot-unit-test-jpa-repo-datajpatest/)
-
-> [Spring Boot Rest Controller Unit Test with @WebMvcTest](https://www.bezkoder.com/spring-boot-webmvctest/)
-
-> Cache the result: [Spring Boot Redis Cache example](https://www.bezkoder.com/spring-boot-redis-cache-example/)
-
-> Documentation: [Spring Boot with Swagger 3 example](https://www.bezkoder.com/spring-boot-swagger-3/)
-
-> Reactive Rest API: [Spring Boot WebFlux example](https://www.bezkoder.com/spring-boot-webflux-rest-api/)
-
-> [Deploy Spring Boot App on AWS – Elastic Beanstalk](https://www.bezkoder.com/deploy-spring-boot-aws-eb/)
-
-Associations:
-> [Spring Boot One To One example with Spring JPA, Hibernate](https://www.bezkoder.com/jpa-one-to-one/)
-
-> [Spring Boot One To Many example with Spring JPA, Hibernate](https://www.bezkoder.com/jpa-one-to-many/)
-
-> [Spring Boot Many To Many example with Spring JPA, Hibernate](https://www.bezkoder.com/jpa-many-to-many/)
-
-Security:
-> [Spring Boot, Spring Security, PostgreSQL: JWT Authentication & Authorization example](https://www.bezkoder.com/spring-boot-security-postgresql-jwt-authentication/)
-
-Exception Handling:
-> [Spring Boot @ControllerAdvice & @ExceptionHandler example](https://www.bezkoder.com/spring-boot-controlleradvice-exceptionhandler/)
-
-> [@RestControllerAdvice example in Spring Boot](https://www.bezkoder.com/spring-boot-restcontrolleradvice/)
-
-Fullstack:
-> [Vue.js + Spring Boot + MySQL/PostgreSQL example](https://www.bezkoder.com/spring-boot-vue-js-crud-example/)
-
-> [Angular 10 + Spring Boot + PostgreSQL example](https://www.bezkoder.com/angular-10-spring-boot-postgresql/)
-
-> [Angular 11 + Spring Boot + PostgreSQL example](https://www.bezkoder.com/angular-11-spring-boot-postgresql/)
-
-> [Angular 12 + Spring Boot + PostgreSQL example](https://www.bezkoder.com/angular-12-spring-boot-postgresql/)
-
-> [Angular 13 + Spring Boot + PostgreSQL example](https://www.bezkoder.com/spring-boot-angular-13-postgresql/)
-
-> [Angular 14 + Spring Boot + PostgreSQL example](https://www.bezkoder.com/spring-boot-angular-14-postgresql/)
-
-> [Angular 15 + Spring Boot + PostgreSQL example](https://www.bezkoder.com/spring-boot-angular-15-postgresql/)
-
-> [Angular 16 + Spring Boot + PostgreSQL example](https://www.bezkoder.com/spring-boot-angular-16-postgresql/)
-
-> [Angular 17 + Spring Boot + PostgreSQL example](https://www.bezkoder.com/spring-boot-angular-17-postgresql/)
-
-> [React + Spring Boot + PostgreSQL example](https://www.bezkoder.com/spring-boot-react-postgresql/)
-
-Run both Back-end & Front-end in one place:
-> [Integrate Angular with Spring Boot Rest API](https://www.bezkoder.com/integrate-angular-spring-boot/)
-
-> [Integrate React.js with Spring Boot Rest API](https://www.bezkoder.com/integrate-reactjs-spring-boot/)
-
-> [Integrate Vue.js with Spring Boot Rest API](https://www.bezkoder.com/integrate-vue-spring-boot/)
-
-## Run Spring Boot application
+### 1. Clone the repo
+```bash
+git clone https://github.com/Saket-Mungse/spring-boot-jpa-postgresql.git
+cd spring-boot-jpa-postgresql
 ```
+
+### 2. Supabase setup
+1. Go to https://supabase.com and create a new project
+2. Go to **Connect** → **Direct** → **Pooler settings**
+3. Copy the JDBC URL (Session Pooler, port 5432)
+4. Update `src/main/resources/application.properties`:
+```properties
+spring.datasource.url=jdbc:postgresql://aws-1-ap-southeast-1.pooler.supabase.com:5432/postgres
+spring.datasource.username=postgres.YOUR_PROJECT_ID
+spring.datasource.password=YOUR_PASSWORD
+```
+
+### 3. Start Redis
+```bash
+docker run -d --name redis-hrms -p 6379:6379 redis:latest
+```
+
+### 4. Run the app
+```bash
 mvn spring-boot:run
 ```
+App starts on `http://localhost:8080`. Hibernate auto-creates all tables on first run.
 
+---
+
+## API Endpoints
+
+### Workers
+| Method | URL | Description |
+|--------|-----|-------------|
+| POST | /api/workers | Create worker |
+| GET | /api/workers | List all workers |
+
+### Sites
+| Method | URL | Description |
+|--------|-----|-------------|
+| POST | /api/sites | Create site |
+| GET | /api/sites | List all sites |
+
+### Attendance
+| Method | URL | Description |
+|--------|-----|-------------|
+| POST | /api/attendance/clock-in | Clock in a worker |
+| POST | /api/attendance/clock-out | Clock out a worker |
+| GET | /api/attendance/active | Active workers (Redis) |
+| GET | /api/attendance/log?workerId=1&from=...&to=... | Paginated history |
+
+### Overtime
+| Method | URL | Description |
+|--------|-----|-------------|
+| GET | /api/overtime/summary/{workerId}?month=2026-05 | Monthly summary |
+| POST | /api/overtime/settle/{workerId}?month=2026-05 | Settle overtime |
+
+---
+
+## AI Tools Used
+- **Claude (Anthropic)** — Used for entity design review, business logic for overtime calculation, ticket root-cause analysis, and Redis caching strategy
+- **GitHub Copilot** — Used for boilerplate service/repository generation and repetitive getter/setter code
+
+---
+
+## Design Decisions
+
+### Schema
+- `BigDecimal` for all monetary values (dailyWageRate, amount) — floating point errors in payroll are real bugs
+- Enum stored as `STRING` not `ORDINAL` — adding enum values later won't silently corrupt existing data
+- Partial unique index on `(worker_id) WHERE clock_out IS NULL` prevents double clock-in at DB level, not just in Java
+- DB-level CHECK constraints on designation and settlement_status enums
+
+### Caching
+- Per-worker Redis keys (`active_workers:{id}`) with 16h TTL instead of a single hash — individual TTL per worker, clean expiry
+- `GET /active` reads exclusively from Redis — zero DB hits for the most frequent supervisor query
+- `NoOpCacheManager` fallback — app starts and serves all requests even when Redis is completely offline
+- `CacheErrorHandler` swallows Redis errors mid-request silently
+
+### Transactions
+- Settlement wraps entire batch in one `@Transactional` method — all 22 entries settle together or none do
+- SMS notification uses `@TransactionalEventListener(AFTER_COMMIT)` — fires only after DB commit succeeds, never inside the transaction
+- External API calls moved outside `@Transactional` — DB connections not held hostage while waiting on third-party APIs
+
+### Connection Pooling
+- `application-staging.yml` has HikariCP `max-lifetime: 270000` (shorter than Supabase's 300s idle timeout)
+- `keepalive-time: 60000` pings connections every 60s to prevent silent drops
+- Uses Session Pooler URL (PgBouncer) not direct connection
+
+### Things I'd do differently with more time
+- Add JWT authentication
+- Write unit tests for overtime calculation edge cases (60h cap, 1.5x vs 2x boundary)
+- Move Supabase password fully to environment variables using Spring Cloud Config
+- Add Swagger/OpenAPI documentation
+- Add a partial unique index migration script instead of relying on Hibernate ddl-auto
+
+---
+
+## Ticket Summary
+
+| Ticket | Problem | Fix |
+|--------|---------|-----|
+| LF-201 | CORS blocked frontend | SecurityFilterChain + CorsConfigurationSource bean + env-specific origins in yml |
+| LF-202 | App crashes when Redis down | CacheErrorHandler + connect timeout + NoOpCacheManager fallback |
+| LF-203 | N+1 queries + no pagination | JOIN FETCH in repository + Pageable through all layers + PagedResponse |
+| LF-204 | Partial settlement + premature SMS | Atomic @Transactional + @TransactionalEventListener(AFTER_COMMIT) |
+| LF-205 | Connection pool exhaustion on staging | HikariCP tuning in staging profile + external API call outside transaction |
