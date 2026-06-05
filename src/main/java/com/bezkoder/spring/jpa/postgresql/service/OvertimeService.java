@@ -1,10 +1,12 @@
 package com.bezkoder.spring.jpa.postgresql.service;
 
+import com.bezkoder.spring.jpa.postgresql.event.OvertimeSettledEvent;
 import com.bezkoder.spring.jpa.postgresql.exception.BusinessException;
 import com.bezkoder.spring.jpa.postgresql.exception.ResourceNotFoundException;
 import com.bezkoder.spring.jpa.postgresql.model.OvertimeEntry;
 import com.bezkoder.spring.jpa.postgresql.repository.OvertimeEntryRepository;
 import com.bezkoder.spring.jpa.postgresql.repository.WorkerRepository;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,11 +22,14 @@ public class OvertimeService {
 
     private final OvertimeEntryRepository overtimeRepo;
     private final WorkerRepository workerRepo;
+    private final ApplicationEventPublisher eventPublisher;
 
     public OvertimeService(OvertimeEntryRepository overtimeRepo,
-                           WorkerRepository workerRepo) {
+                           WorkerRepository workerRepo,
+                           ApplicationEventPublisher eventPublisher) {
         this.overtimeRepo = overtimeRepo;
         this.workerRepo = workerRepo;
+        this.eventPublisher = eventPublisher;
     }
 
     public Map<String, Object> getMonthlySummary(Long workerId, String month) {
@@ -34,7 +39,6 @@ public class OvertimeService {
 
         YearMonth yearMonth = YearMonth.parse(month);
         LocalDate monthStart = yearMonth.atDay(1);
-
         List<OvertimeEntry> entries = overtimeRepo
                 .findByWorkerIdAndMonth(workerId, monthStart);
 
@@ -70,7 +74,7 @@ public class OvertimeService {
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Worker not found with id: " + workerId));
 
-        // Cannot settle current month
+        // Cannot settle current or future month
         YearMonth requestedMonth = YearMonth.parse(month);
         YearMonth currentMonth = YearMonth.now();
         if (!requestedMonth.isBefore(currentMonth)) {
@@ -87,7 +91,6 @@ public class OvertimeService {
                     "No overtime entries found for worker in " + month);
         }
 
-        // Check if already settled
         boolean allSettled = entries.stream()
                 .allMatch(e -> e.getSettlementStatus() ==
                         OvertimeEntry.SettlementStatus.SETTLED);
@@ -96,7 +99,7 @@ public class OvertimeService {
                     "Overtime for " + month + " is already settled");
         }
 
-        // Settle all entries atomically
+        // Settle all atomically — entire batch or nothing
         BigDecimal totalAmount = BigDecimal.ZERO;
         for (OvertimeEntry entry : entries) {
             if (entry.getSettlementStatus() == OvertimeEntry.SettlementStatus.PENDING) {
@@ -106,6 +109,11 @@ public class OvertimeService {
         }
         overtimeRepo.saveAll(entries);
 
+        // Publish event — SMS fires AFTER_COMMIT, not inside this transaction
+        eventPublisher.publishEvent(
+                new OvertimeSettledEvent(this, workerId, month, totalAmount, entries.size())
+        );
+
         Map<String, Object> result = new HashMap<>();
         result.put("workerId", workerId);
         result.put("month", month);
@@ -113,5 +121,19 @@ public class OvertimeService {
         result.put("entriesSettled", entries.size());
         result.put("status", "SETTLED");
         return result;
+    }
+
+
+    // Fetch external data BEFORE transaction opens
+    // This prevents holding a DB connection while waiting on external API
+    private BigDecimal fetchMinimumWageRate() {
+        try {
+            // In production: RestTemplate/WebClient call to govt API
+            // Fetched OUTSIDE @Transactional so DB connection is not held
+            return new BigDecimal("400.00"); // fallback default
+        } catch (Exception e) {
+            System.err.println("External wage API unavailable, using default: " + e.getMessage());
+            return new BigDecimal("400.00");
+        }
     }
 }

@@ -1,0 +1,23 @@
+# Staging profile — Supabase + HikariCP tuning
+spring:
+  datasource:
+    url: jdbc:postgresql://aws-1-ap-southeast-1.pooler.supabase.com:5432/postgres
+    username: postgres.yqippyebjsofyubifblh
+    password: ${SUPABASE_PASSWORD}
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      max-lifetime: 270000
+      keepalive-time: 60000
+      connection-timeout: 3000
+      idle-timeout: 60000
+
+  data:
+    redis:
+      connect-timeout: 2000
+      timeout: 1000
+
+# Staging CORS
+app:
+  cors:
+    allowed-origins: http://localhost:3000,https://your-staging-frontend.com
